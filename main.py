@@ -1,6 +1,6 @@
 import csv
 import urllib.request
-
+import datetime
 import charset_normalizer
 
 
@@ -16,12 +16,21 @@ def detect_encoding(filepath: str):
         return result.get('encoding')
 
 
+def index_of_line():
+    with open('./test.csv', 'r') as f:
+        for i, line in enumerate(f, start=1):
+            return i
+
+
 def validate_phone(phone: str) -> bool:
     return len(phone) == 11
 
 
-def calculate_age(dob: str) -> str:
-    pass
+def calculate_age(dob: str):
+    birthdate = datetime.datetime.strptime(dob, '%d.%m.%Y')
+    today = datetime.datetime.now()
+    age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
+    return age
 
 
 def read_file():
@@ -31,8 +40,9 @@ def read_file():
         reader = csv.reader(f, delimiter=';')
         for line in reader:
             if not validate_phone(line[0]):
-                print(line)
-            formated_line = f'ФИО: {line[4]}; Телефон: {line[0]}; Дата рождения: {line[8]}'
+                defect_line = f' ИО: {line[3]}; Телефон: {line[0]};'
+                print(defect_line)
+            formated_line = f'ФИО: {line[4]}; Телефон: {line[0]}; Дата рождения: {line[8]}; Возраст на сегодня: {calculate_age(line[8])}'
             print(formated_line)
 
 
