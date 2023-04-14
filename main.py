@@ -38,12 +38,12 @@ def read_file():
     encoding = detect_encoding(filepath)
     with open(filepath, 'r', encoding=encoding) as f:
         reader = csv.reader(f, delimiter=';')
-        for line in reader:
+        for i, line in enumerate(reader):
             if not validate_phone(line[0]):
-                defect_line = f' ИО: {line[3]}; Телефон: {line[0]};'
+                defect_line = f'{i+1} - ИО: {line[3]}; Телефон: {line[0]};'
                 print(defect_line)
             formated_line = f'ФИО: {line[4]}; Телефон: {line[0]}; Дата рождения: {line[8]}; Возраст на сегодня: {calculate_age(line[8])}'
-            print(formated_line)
+            # print(formated_line)
 
 
 def main():
