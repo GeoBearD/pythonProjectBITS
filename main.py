@@ -7,43 +7,42 @@ import re
 from prettytable import PrettyTable
 import charset_normalizer
 
-number_of_digits_in_number = 11
+number_of_digits_in_phone = 11
+filename = './base.csv'
+url = 'https://lk.globtelecom.ru/upload/test_prog1.csv'
 
 
 def download_file():
-    url = 'https://lk.globtelecom.ru/upload/test_prog1.csv'
-    filename = 'base.csv'
     urllib.request.urlretrieve(url, filename)
 
 
-def detect_encoding(filepath: str):
-    with open(filepath, 'rb') as f:
+def detect_encoding(filename: str) -> str:
+    with open(filename, 'rb') as f:
         result = charset_normalizer.detect(f.read())
         return result.get('encoding')
 
 
 def index_of_line():
-    with open('./base.csv', 'r') as f:
+    with open(filename, 'r') as f:
         for i, line in enumerate(f, start=1):
             return i
 
 
 def validate_phone(phone: str) -> bool:
     valid_numbers = r"^[0-9]+$"
-    return len(phone) == number_of_digits_in_number and re.match(valid_numbers, phone)
+    return len(phone) == number_of_digits_in_phone and re.match(valid_numbers, phone)
 
 
-def calculate_age(dob: str):
+def calculate_age(dob: str) -> int:
     birthdate = datetime.datetime.strptime(dob, '%d.%m.%Y')
     today = datetime.datetime.now()
     age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
     return age
 
 
-def stats():
-    filepath = './base.csv'
-    encoding = detect_encoding(filepath)
-    with open(filepath, 'r', encoding=encoding) as f:
+def after_read_statistic():
+    encoding = detect_encoding(filename)
+    with open(filename, 'r', encoding=encoding) as f:
         phones = []
         surnames = []
         years = {}
@@ -69,13 +68,10 @@ def stats():
         print(table_num)
 
         surname_counts = Counter(surnames)
-        duplicate_surnames = [surname for surname, count in surname_counts.items() if count > 1]
-        num_duplicate_surnames = len(duplicate_surnames)
         samesurname_count = 0
         for surname, count in surname_counts.items():
             if count > 1:
                 samesurname_count += count
-        print(samesurname_count)
         table_sur = PrettyTable()
         table_sur.field_names = ["Количество однофамильцев"]
         table_sur.add_row([samesurname_count])
@@ -91,33 +87,30 @@ def stats():
 
 
 def read_file():
-    filepath = './base.csv'
-    encoding = detect_encoding(filepath)
-    with open(filepath, 'r', encoding=encoding) as f:
+    encoding = detect_encoding(filename)
+    with open(filename, 'r', encoding=encoding) as f:
         reader = csv.reader(f, delimiter=';')
         for i, line in enumerate(reader):
+            formated_line = f'ФИО: {line[4]}; Телефон:{line[0]}; Дата Рождения: {line[8]}; Возраст на сегодня:{calculate_age(line[8])}; \n'
             if not validate_phone(line[0]):
                 defect_line = f'{i + 1} - ИО: {line[3]}; Телефон: {line[0]};'
                 print(defect_line)
-            if validate_phone(line[0]) and line[7] == 'pos':
-                formated_line = f'ФИО: {line[4]}; Телефон:{line[0]}; Дата Рождения: {line[8]}; Возраст на сегодня:{calculate_age(line[8])}; \n'
+            elif validate_phone(line[0]) and line[7] == 'pos':
                 with open("pos_h.csv", "a", encoding=encoding) as f:
-                    f.write(right_string)
-            if validate_phone(line[0]) and line[7] == 'cash':
-                right_string = f'ФИО: {line[4]}; Телефон:{line[0]}; Дата Рождения: {line[8]}; Возраст на сегодня:{calculate_age(line[8])}; \n'
+                    f.write(formated_line)
+            elif validate_phone(line[0]) and line[7] == 'cash':
                 with open("cash_h.csv", "a", encoding=encoding) as f:
-                    f.write(right_string)
+                    f.write(formated_line)
 
 
 def delete():
-    filepath = './base.csv'
-    os.remove(filepath)
+    os.remove(filename)
 
 
 def main():
     download_file()
     read_file()
-    stats()
+    after_read_statistic()
     delete()
 
 
