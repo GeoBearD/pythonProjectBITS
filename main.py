@@ -7,35 +7,35 @@ import re
 from prettytable import PrettyTable
 import charset_normalizer
 
-number_of_digits_in_phone = 11
-filename = './base.csv'
-url = 'https://lk.globtelecom.ru/upload/test_prog1.csv'
+number_of_digits_in_phone = 11                            # Корректное колличество цифр в номере
+filename = './base.csv'                                   # Заданное имя файла
+url = 'https://lk.globtelecom.ru/upload/test_prog1.csv'   # Ссылка на файл
 
 
-def download_file():
+def download_file():                                      # Функция для скачивания файла
     urllib.request.urlretrieve(url, filename)
 
 
-def detect_encoding(filename: str) -> str:
+def detect_encoding(filename: str) -> str:                # Функция, определяющая кодировку файла и норм. его
     with open(filename, 'rb') as f:
         result = charset_normalizer.detect(f.read())
         return result.get('encoding')
 
 
-def validate_phone(phone: str) -> bool:
+def validate_phone(phone: str) -> bool:                   # Проверка номер на валидность
     valid_numbers = r"^[0-9]+$"
     return len(phone) == number_of_digits_in_phone and re.match(valid_numbers, phone)
 
 
-def calculate_age(dob: str) -> int:
+def calculate_age(dob: str) -> int:                       # Определение возраста на данный момент
     birthdate = datetime.datetime.strptime(dob, '%d.%m.%Y')
     today = datetime.datetime.now()
     age = today.year - birthdate.year - ((today.month, today.day) < (birthdate.month, birthdate.day))
     return age
 
 
-def after_read_statistic():
-    encoding = detect_encoding(filename)
+def after_read_statistic():                               # Функция, для вывода в консоль данных в табличном виде
+    encoding = detect_encoding(filename)                  # Нуждается в рефокторинге!
     with open(filename, 'r', encoding=encoding) as f:
         phones = []
         surnames = []
@@ -80,7 +80,7 @@ def after_read_statistic():
         print(table)
 
 
-def read_file():
+def read_file():                                           # Считываем файл, раскидываем по двум файлам и выводим некорректные номера
     encoding = detect_encoding(filename)
     with open(filename, 'r', encoding=encoding) as f:
         reader = csv.reader(f, delimiter=';')
@@ -97,7 +97,7 @@ def read_file():
                     f.write(formated_line)
 
 
-def delete():
+def delete():                                             # Удаляем файл после манипуляций
     os.remove(filename)
 
 
