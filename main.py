@@ -22,12 +22,6 @@ def detect_encoding(filename: str) -> str:
         return result.get('encoding')
 
 
-def index_of_line():
-    with open(filename, 'r') as f:
-        for i, line in enumerate(f, start=1):
-            return i
-
-
 def validate_phone(phone: str) -> bool:
     valid_numbers = r"^[0-9]+$"
     return len(phone) == number_of_digits_in_phone and re.match(valid_numbers, phone)
@@ -90,10 +84,10 @@ def read_file():
     encoding = detect_encoding(filename)
     with open(filename, 'r', encoding=encoding) as f:
         reader = csv.reader(f, delimiter=';')
-        for i, line in enumerate(reader):
-            formated_line = f'ФИО: {line[4]}; Телефон:{line[0]}; Дата Рождения: {line[8]}; Возраст на сегодня:{calculate_age(line[8])}; \n'
+        for i, line in enumerate(reader, start=1):
+            formated_line = f'{i}; ФИО: {line[4]}; Телефон: {line[0]}; Дата Рождения: {line[8]}; Возраст на сегодня: {calculate_age(line[8])}; \n'
             if not validate_phone(line[0]):
-                defect_line = f'{i + 1} - ИО: {line[3]}; Телефон: {line[0]};'
+                defect_line = f'{i} - ИО: {line[3]}; Телефон: {line[0]};'
                 print(defect_line)
             elif validate_phone(line[0]) and line[7] == 'pos':
                 with open("pos_h.csv", "a", encoding=encoding) as f:
