@@ -85,7 +85,7 @@ def read_file():
     with open(filename, 'r', encoding=encoding) as f:
         reader = csv.reader(f, delimiter=';')
         for i, line in enumerate(reader, start=1):
-            formated_line = f'{i}; ФИО: {line[4]}; Телефон: {line[0]}; Дата Рождения: {line[8]}; Возраст на сегодня: {calculate_age(line[8])}; \n'
+            formated_line = f' ФИО: {line[4]}; Телефон: {line[0]}; Дата Рождения: {line[8]}; Возраст на сегодня: {calculate_age(line[8])}; \n'
             if not validate_phone(line[0]):
                 defect_line = f'{i} - ИО: {line[3]}; Телефон: {line[0]};'
                 print(defect_line)
