@@ -55,3 +55,29 @@ if __name__ == '__main__':
 # ЗАДАНИЕ СО ЗВЕЗДОЧКОЙ - ЭТОТ ДЕКОРАТОР ДОЛЖЕН ПРИНИМАТЬ 1 АРГУМЕНТ(СЕКУНДЫ) И ЕСЛИ ВРЕМЯ ВЫПОЛНЕНИЯ БУДЕТ БОЛЬШЕ ЭТИХ
 # СЕКУНД, ДОЛЖНО ВЫДАВАТЬ ОШИБКУ (ТЕКСТ: ВРЕМЯ ВЫПОЛНЕНИЕ ПРЕВЫСИЛО (АРГУМЕНТ)
 # ПОЧИТАТЬ В ИНТЕРНЕТАХ О ТОМ КАК ПЕРЕДАВАТЬ АРГУМЕНТЫ В ДЕКОРАТОР И ПРОЧИТАЬ ЧТО ТАКОЕ ЭКСЭПШН(ИСКЛЮЧЕНИЯ)
+
+import time
+
+
+def decorator_for_decorator(seconds):
+    def decorator(func):
+        def inner(*args, **kwargs):
+            start = time.time()
+            result = func(*args, **kwargs)
+            time.sleep(2)
+            end = time.time()
+            working_time = (end - start) * 1000
+            if working_time > seconds * 1000:
+                raise TimeoutError(f'время выполнения превысило {seconds} секунд')
+            print(f'функция работала {working_time:.3f} миллисекунд')
+            return result
+        return inner
+    return decorator
+
+
+@decorator_for_decorator(2)
+def mult(a, d):
+    return (a ** d) * 250 * 20 / 50 * 34 / 45 * 59
+
+
+print(mult(4, 6))
