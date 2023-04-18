@@ -11,11 +11,6 @@ def printer(function):
 
 # рекурсия
 
-def custom_sum1(numbers):
-    result = 0
-    for number in numbers:
-        result += number
-    return result
 
 
 def custom_sum2(numbers):
