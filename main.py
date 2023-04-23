@@ -42,25 +42,21 @@ def read_content():
 
 def after_read_statistic(content):
     phones = []
+    base = []
     surnames = []
     years = {}
     male_count = 0
     female_count = 0
-    lgbt_count = 0
+    name_duplicates = {}
     reader = csv.reader(content, delimiter=';')
     for line in reader:
         fullname = line[4]
         surname = fullname.split(' ')[0]
         surnames.append(surname)
-        name = fullname.split(' ')[1]
-        if name.endswith(('А', 'Я', 'Е')):
-            female_count += 1
-        elif name.endswith(('Ь')):
-            lgbt_count += 1
-        else:
-            male_count += 1
+
         phone = validate_phone(line[0])
         phones.append(phone)
+
         date_string = line[8]
         date_obj = datetime.datetime.strptime(date_string, "%d.%m.%Y")
         year = date_obj.year
@@ -68,40 +64,47 @@ def after_read_statistic(content):
             years[year] += 1
         else:
             years[year] = 1
+        # store name duplicates
+        if surname in name_duplicates:
+            name_duplicates[surname].append(fullname)
+        else:
+            name_duplicates[surname] = [fullname]
+
     same_surname_count = sum(count for count in Counter(surnames).values() if count > 1)
     duplicate_phones = set(phone for phone in phones if phones.count(phone) > 1)
     num_duplicate_phones = len(duplicate_phones)
-    table = PrettyTable()
-    table.field_names = ["Количество повторяющихся номеров",
-                         "Повторяющиеся номера"]
-    table.add_row([num_duplicate_phones, ", ".join(duplicate_phones)])
-    print(table)
+    table1 = PrettyTable()
+    table1.field_names = ["Количество повторяющихся номеров", "Повторяющиеся номера"]
+    table1.add_row([num_duplicate_phones, ", ".join(duplicate_phones)])
+    print(table1)
+
     table2 = PrettyTable()
     table2.field_names = ["Год", "Количество родившихся"]
     for year, count in sorted(years.items()):
         table2.add_row([year, count])
     print(table2)
+
     table4 = PrettyTable()
-    unique_surnames = set(surnames)
-    duplicates = []
-    for sur_name in unique_surnames:
-        if sur_name.endswith(('А', 'Я', 'Е')):
+    table4.field_names = ["Фамилия", "Количество однофамильцев"]
+    for sur_name, name_list in name_duplicates.items():
+        if len(name_list) > 1:
+            base.append(name_list)
+            table4.add_row([sur_name, len(name_list)])
+    print(table4)
+
+    patronymics = []
+    for name_list in base:
+        patronymic_list = [name.split(' ')[2] for name in name_list]
+        patronymics.extend(patronymic_list)
+    for patron in patronymics:
+        if patron.endswith('А'):
             female_count += 1
-        elif sur_name.endswith(('О', 'Ь')):
-            lgbt_count += 1
         else:
             male_count += 1
-        if surnames.count(sur_name) > 1:
-            duplicates.append((sur_name, surnames.count(sur_name)))
     table3 = PrettyTable()
-    table3.field_names = ["Количество однофамильцев всего в файле:",
-                          "Количество мужчин", "Количество женщин", "Колличество LGBT+"]
-    table3.add_row([same_surname_count, male_count, female_count, lgbt_count])
+    table3.field_names = ["Количество однофамильцев всего в файле:", "Количество мужчин", "Количество женщин"]
+    table3.add_row([same_surname_count, male_count, female_count])
     print(table3)
-    table4.field_names = ["Фамилия", "Количество однофамильцев"]
-    for sur_name, count in duplicates:
-        table4.add_row([sur_name, count])
-    print(table4)
 
 
 def sort_in_files(content):  # Считываем файл, раскидываем по двум файлам и выводим некорректные номера
