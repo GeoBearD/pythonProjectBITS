@@ -8,7 +8,11 @@ URL = 'https://lk.globtelecom.ru/upload/test_prog1.csv'  # Ссылка на ф�
 
 
 def download_file():  # Функция для скачивания файла
-    urllib.request.urlretrieve(URL, FILENAME)
+    if os.path.exists(FILENAME):
+        print(f"Файл {FILENAME} уже существует.")
+    else:
+        urllib.request.urlretrieve(URL, FILENAME)
+        print(f"Файл {FILENAME} успешно загружен.")
 
 
 def detect_encoding(file: str) -> str:  # Функция, определяющая кодировку файла и норм. его
@@ -24,4 +28,8 @@ def read_content():
 
 
 def delete():  # Удаляем файл после манипуляций
-    os.remove(FILENAME)
+    if os.path.exists(FILENAME):
+        os.remove(FILENAME)
+        print(f"Файл {FILENAME} успешно удален.")
+    else:
+        print(f"Файл {FILENAME} не найден.")

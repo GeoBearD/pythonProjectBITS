@@ -1,6 +1,6 @@
 import csv
 import datetime
-from collections import Counter
+from collections import Counter, defaultdict
 import re
 from prettytable import PrettyTable
 
@@ -47,7 +47,10 @@ def after_read_statistic(content):
             name_duplicates[surname] = [fullname]
 
     same_surname_count = sum(count for count in Counter(surnames).values() if count > 1)
-    duplicate_phones = set(phone for phone in phones if phones.count(phone) > 1)
+    duplicate_phones = []
+    for phone in phones:
+        if phones.count(phone) > 1:
+            duplicate_phones.append(phone)
     num_duplicate_phones = len(duplicate_phones)
     table1 = PrettyTable()
     table1.field_names = ["Количество повторяющихся номеров", "Повторяющиеся номера"]
