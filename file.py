@@ -2,7 +2,6 @@ import charset_normalizer
 import os
 import urllib.request
 
-
 FILENAME = './base.csv'  # Заданное имя файла
 URL = 'https://lk.globtelecom.ru/upload/test_prog1.csv'  # Ссылка на файл
 
