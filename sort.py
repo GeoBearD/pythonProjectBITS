@@ -7,6 +7,11 @@ from prettytable import PrettyTable
 NUMBERS_OF_DIGITS_IN_PHONE = 11  # Корректное колличество цифр в номере
 
 
+def write_to_file(line, filename, encoding):
+    with open(filename, "a", encoding=encoding) as f:
+        f.write(line)
+
+
 def sort_in_files(content):  # Считываем файл, раскидываем по двум файлам и выводим некорректные номера
     encoding = detect_encoding(FILENAME)
     reader = csv.reader(content, delimiter=';')
@@ -22,16 +27,8 @@ def sort_in_files(content):  # Считываем файл, раскидывае
         formatted_line = f'ФИО: {initials}; Телефон: {validate_phone(phone)}; Дата Рождения: {dob}; Возраст на сегодня: {age}; \n'
         if len(validate_phone(phone)) != NUMBERS_OF_DIGITS_IN_PHONE:
             table_1.add_row([i, name_surname, validate_phone(phone)])
-
-        elif validate_phone(phone) and payment_method == "pos":
-            with open("pos_h.csv", "a", encoding=encoding) as f:
-                f.write(formatted_line)
-        elif validate_phone(phone) and payment_method == "cash":
-            with open("cash_h.csv", "a", encoding=encoding) as f:
-                f.write(formatted_line)
-        elif validate_phone(phone) and payment_method == "cards":
-            with open("cards_h.csv", "a", encoding=encoding) as f:
-                f.write(formatted_line)
+        else:
+            write_to_file(formatted_line, f'{payment_method}_h.csv', encoding)
 
     if len(table_1._rows) > 0:
         print(table_1)
