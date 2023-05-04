@@ -2,8 +2,5 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/base.csv" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/cards_h.csv" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/cash_h.csv" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/pos_h.csv" charset="windows-1251" />
   </component>
 </project>
